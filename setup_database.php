@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
 $user = 'root'; 
-$pass = '';   
+$pass = 'DAPHNY08';   
 $dbname = 'quicklist';
 
 echo "Setting up Quick List database...\n";
