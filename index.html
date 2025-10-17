@@ -257,11 +257,8 @@
             <input type="text" id="itemInput" placeholder="Add an item to the list...">
             <button id="addButton">Add Item</button>
         </div>
-        
         <div class="items-container" id="itemsContainer">
-            <!-- Items will be dynamically added here -->
         </div>
-        
         <footer>
             <p>Anyone with this link can view and edit this list</p>
             <div id="connectionStatus" class="connection-status online">
@@ -273,7 +270,7 @@
     </div>
 
     <script>
-        // DOM elements
+        // DOM
         const itemInput = document.getElementById('itemInput');
         const addButton = document.getElementById('addButton');
         const itemsContainer = document.getElementById('itemsContainer');
@@ -282,27 +279,24 @@
 
         // Configuration
         const LIST_ID = 'community-picnic';
-        const SYNC_INTERVAL = 2000; // Sync every 2 seconds
+        const SYNC_INTERVAL = 2000; 
         let lastSyncTime = 0;
         let isOnline = true;
-
-        // Add new item to the list
+ // Add new item 
         addButton.addEventListener('click', addItem);
         itemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 addItem();
             }
         });
-
         function addItem() {
             const text = itemInput.value.trim();
             if (text === '') return;
-
-            // Show optimistic UI update
+            // Show  UI update
             const tempId = 'temp_' + Date.now();
             addItemToUI({ id: tempId, text, completed: 0 });
             itemInput.value = '';
-
+            
             // Send to server
             fetch('api.php', {
                 method: 'POST',
@@ -314,11 +308,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Remove temporary item and add the real one
                     removeItemFromUI(tempId);
                     addItemToUI(data.item);
                 } else {
-                    // Show error
                     alert('Error adding item: ' + data.message);
                     removeItemFromUI(tempId);
                 }
@@ -326,18 +318,15 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Item saved locally.');
-                // Keep the temporary item as offline version
             });
         }
 
-        // Toggle item completion
+        //  item completion
         function toggleItem(id) {
-            // Optimistic UI update
             const itemElement = document.querySelector(`[data-id="${id}"]`);
             if (itemElement) {
                 itemElement.classList.toggle('completed');
             }
-
             // Send to server
             fetch('api.php', {
                 method: 'POST',
@@ -361,15 +350,11 @@
                 alert('Network error. Changes saved locally.');
             });
         }
-
-        // Delete item from the list
         function deleteItem(id) {
-            // Optimistic UI update
             const itemElement = document.querySelector(`[data-id="${id}"]`);
             if (itemElement) {
                 itemElement.style.opacity = '0.5';
             }
-
             // Send to server
             fetch('api.php', {
                 method: 'POST',
@@ -383,7 +368,6 @@
                 if (data.success) {
                     removeItemFromUI(id);
                 } else {
-                    // Revert UI if failed
                     if (itemElement) {
                         itemElement.style.opacity = '1';
                     }
@@ -396,15 +380,11 @@
                 removeItemFromUI(id);
             });
         }
-
-        // Add item to UI
         function addItemToUI(item) {
-            // Remove empty state if it exists
             const emptyState = itemsContainer.querySelector('.empty-state');
             if (emptyState) {
                 emptyState.remove();
             }
-
             const itemElement = document.createElement('div');
             itemElement.className = `item ${item.completed ? 'completed' : ''}`;
             itemElement.setAttribute('data-id', item.id);
@@ -418,21 +398,15 @@
             `;
             itemsContainer.appendChild(itemElement);
         }
-
-        // Remove item from UI
         function removeItemFromUI(id) {
             const itemElement = document.querySelector(`[data-id="${id}"]`);
             if (itemElement) {
                 itemElement.remove();
             }
-
-            // Show empty state if no items
             if (itemsContainer.children.length === 0) {
                 showEmptyState();
             }
         }
-
-        // Show empty state
         function showEmptyState() {
             itemsContainer.innerHTML = `
                 <div class="empty-state">
@@ -441,8 +415,6 @@
                 </div>
             `;
         }
-
-        // Sync with server
         function syncWithServer() {
             if (!isOnline) return;
 
@@ -457,19 +429,14 @@
             .then(data => {
                 if (data.success) {
                     lastSyncTime = data.timestamp;
-                    
-                    // Update UI with new items
                     if (data.items && data.items.length > 0) {
                         data.items.forEach(item => {
-                            // Check if item already exists
                             const existingItem = document.querySelector(`[data-id="${item.id}"]`);
                             if (!existingItem) {
                                 addItemToUI(item);
                             }
                         });
                     }
-                    
-                    // Update sync indicator
                     syncIndicator.textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
                 }
             })
@@ -478,8 +445,6 @@
                 setOfflineMode();
             });
         }
-
-        // Set offline mode
         function setOfflineMode() {
             isOnline = false;
             connectionStatus.className = 'connection-status offline';
@@ -488,8 +453,6 @@
                 <span>Offline - Working locally, will sync when online</span>
             `;
         }
-
-        // Set online mode
         function setOnlineMode() {
             isOnline = true;
             connectionStatus.className = 'connection-status online';
@@ -497,11 +460,8 @@
                 <div class="status-dot"></div>
                 <span>Online - Changes sync in real-time</span>
             `;
-            // Immediately sync when coming back online
             syncWithServer();
         }
-
-        // Check online status
         function checkOnlineStatus() {
             if (navigator.onLine) {
                 setOnlineMode();
@@ -510,22 +470,19 @@
             }
         }
 
-        // Initialize
+        
         function init() {
-            // Load initial items
             syncWithServer();
             
-            // Set up periodic sync
             setInterval(syncWithServer, SYNC_INTERVAL);
             
-            // Monitor online status
             window.addEventListener('online', setOnlineMode);
             window.addEventListener('offline', setOfflineMode);
             checkOnlineStatus();
         }
 
-        // Start the application
         init();
     </script>
 </body>
+
 </html>
