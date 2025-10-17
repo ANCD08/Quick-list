@@ -3,14 +3,11 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
-
-// Simple database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', 'Chipidje@24');
 define('DB_NAME', 'quicklist');
 
-// Create database connection
 function getDB() {
     static $db = null;
     if ($db === null) {
@@ -22,19 +19,14 @@ function getDB() {
     return $db;
 }
 
-// Initialize database tables
 function initDB() {
     $db = getDB();
-    
-    // Create lists table
     $db->query("CREATE TABLE IF NOT EXISTS lists (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
-    
-    // Create items table
     $db->query("CREATE TABLE IF NOT EXISTS items (
         id INT AUTO_INCREMENT PRIMARY KEY,
         list_id VARCHAR(50) NOT NULL,
@@ -44,8 +36,6 @@ function initDB() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (list_id) REFERENCES lists(id) ON DELETE CASCADE
     )");
-    
-    // Create default list if it doesn't exist
     $result = $db->query("SELECT id FROM lists WHERE id = 'community-picnic'");
     if ($result->num_rows == 0) {
         $db->query("INSERT INTO lists (id, name, description) VALUES (
@@ -55,8 +45,7 @@ function initDB() {
         )");
     }
 }
-
-// Handle API requests
+// API requests
 $action = $_POST['action'] ?? '';
 $listId = $_POST['list_id'] ?? '';
 $response = ['success' => false, 'message' => 'Unknown action'];
@@ -150,4 +139,5 @@ try {
 }
 
 echo json_encode($response);
+
 ?>
