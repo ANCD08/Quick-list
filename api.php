@@ -5,7 +5,7 @@ header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', 'Chipidje@24');
+define('DB_PASS', 'DAPHNY08');
 define('DB_NAME', 'quicklist');
 
 function getDB() {
